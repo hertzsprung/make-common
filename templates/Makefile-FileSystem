@@ -1,3 +1,51 @@
+# Copy a file to another destination.
+#
+# The destination directory is made a prerequisite but
+# the caller is responsible for ensuring the destination directory
+# is a target.
+#
+# $1 -- source file
+# $2 -- target file
+define CopyFile
+
+$(eval $(call Copy,$(patsubst %/,%,$(dir $1)),$(notdir $1),$(patsubst %/,%,$(dir $2)),$(notdir $2)))
+  
+endef
+
+# $1 -- source directory
+# $2 -- source filename
+# $3 -- target directory
+# $4 -- target filename
+define Copy
+
+$3/$4: $1/$2 | $3
+	cp $$< $$@
+
+endef
+
+# Copy files from a source directory to a destination directory.
+#
+# $1 -- source directory
+# $2 -- source filenames
+# $3 -- target directory
+define CopyNamedFiles
+
+$(foreach file,$2,$(eval $(call CopyNamedFile,$1,$(file),$3)))
+
+endef
+
+# Copy a file from a source directory to a destination directory.
+# Convenient when the filename remains the same.
+#
+# $1 -- source directory
+# $2 -- source filename
+# $3 -- target directory
+define CopyNamedFile
+
+$(eval $(call CopyFile,$1/$2,$3/$2))
+
+endef
+
 # $1 -- directory
 define MakeDir
 

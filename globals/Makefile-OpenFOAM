@@ -1,0 +1,9 @@
+polyMesh := constant/polyMesh
+triSurface := constant/triSurface
+boundary := $(polyMesh)/boundary
+meshFiles := $(addprefix $(polyMesh)/,boundary faces neighbour owner points)
+
+fvSchemes := system/fvSchemes
+fvSolution := system/fvSolution
+controlDict := system/controlDict
+systemFiles := $(controlDict) $(fvSchemes) $(fvSolution)
