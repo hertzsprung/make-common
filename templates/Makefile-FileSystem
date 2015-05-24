@@ -1,0 +1,8 @@
+# $1 -- directory
+define MakeDir
+
+$1:
+	mkdir -p $$@
+
+endef
+
