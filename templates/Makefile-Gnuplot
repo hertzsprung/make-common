@@ -1,0 +1,12 @@
+# Create a gnuplot LaTeX output, $1, from a given .plt file, $2
+#
+# $1 -- case directory
+# $2 -- LaTeX output
+# $3 -- .plt file
+define Gnuplot
+
+$1/$2: $3 | $1
+	( cd $1 && $(gnuplot) -p -e "set output '../$(notdir $1)/$2'; load '$(abspath $3)'" )
+
+endef
+
