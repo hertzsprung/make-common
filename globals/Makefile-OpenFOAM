@@ -7,3 +7,7 @@ fvSchemes := system/fvSchemes
 fvSolution := system/fvSolution
 controlDict := system/controlDict
 systemFiles := $(controlDict) $(fvSchemes) $(fvSolution)
+
+gmtDicts := constant/gmtDicts
+export GMTU := $(abspath src/gmt)
+

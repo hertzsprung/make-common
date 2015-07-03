@@ -1,0 +1,34 @@
+# Create a EPS/PDF figure using plotPatchData for a given gmtDict and time.
+# You should typically not use this template directly.  Rather, use a test-specific template
+# that knows about the data dependencies for the plot.
+#
+# $1 -- case directory 
+# $2 -- gmtDict path
+# $3 -- time
+# $4 -- file extension
+define GmtPlot
+
+$1/$3/$(notdir $2).$4: \
+  $1/$(gmtDicts)/$(notdir $2) \
+| $1/$(gmtDicts)
+	$(gmtFoam) -case $1 -time $3 $(notdir $2)
+
+$(eval $(call CopyFile,$2,$1/$(gmtDicts)/$(notdir $2)))
+
+endef
+
+# $1 -- target directory
+# $2 -- target filename
+# $3 -- palette filename
+# $4 -- scale min/max/increment (e.g. 0/1/0.1)
+# $5 -- dimensions and orientation (e.g. 1i/0i/3i/0.2ih)
+# $6 -- annotations (e.g. 0.2), see http://gmt.soest.hawaii.edu/doc/latest/gmt.html#b-full
+define PlotGmtLegend
+
+$1/$2: $1/$2.cpt | $1
+	$(psscale) -C$1/$2.cpt -S -E -D$5 -B$6 | ps2eps -f -q > $$@
+
+$1/$2.cpt: $3 | $1
+	$(makecpt) -C$3 -Z -D -T$4 > $$@
+
+endef
