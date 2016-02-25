@@ -1,2 +1,4 @@
 advectionFoam := $(FOAM_USER_APPBIN)/advectionFoam
+globalSum := $(FOAM_USER_APPBIN)/globalSum
 gmtFoam := $(FOAM_USER_APPBIN)/gmtFoam
+sumFields := $(FOAM_USER_APPBIN)/sumFields

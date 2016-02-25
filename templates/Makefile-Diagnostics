@@ -1,0 +1,76 @@
+# Check that $1/$2/l2error$3.txt is bounded by $4
+# The result, '0' (false) or '1' (true), is written to
+# $1/$2/l2errorBound$3.txt
+#
+# $1 -- case
+# $2 -- time
+# $3 -- field
+# $4 -- upper bound
+define BoundedL2Error
+
+$1/$2/l2errorBound$3.txt: $1/$2/l2error$3.txt
+	echo $$$$(cat $1/$2/l2error$3.txt) \< $4 | bc -l > $$@
+
+endef
+
+# Create $1/$2/l2error$3.txt by analysing $1/$2/$3_diff
+# (which should be defined using FieldDiff) and $1/$2/$3_analytic
+#
+# $1 -- case
+# $2 -- time
+# $3 -- field
+define L2Error
+
+$1/$2/l2error$3.txt: $1/$2/l2error$3_diff.txt $1/$2/l2error$3_analytic.txt
+	paste -d'/' $1/$2/l2error$3_diff.txt $1/$2/l2error$3_analytic.txt | bc -l > $$@
+
+$1/$2/l2error$3_diff.txt: $1/$2/globalSum$3_diff.dat
+	$(call ExtractStat,$$@,$$<,3)
+
+$1/$2/l2error$3_analytic.txt: $1/$2/globalSum$3_analytic.dat
+	$(call ExtractStat,$$@,$$<,3)
+
+$(eval $(call GlobalSum,$1,$2,$3_diff))
+$(eval $(call GlobalSum,$1,$2,$3_analytic))
+
+endef
+
+# Creates $1/$2/$3_diff by subtracting the analytic field from the numeric field
+#
+# $1 -- case
+# $2 -- time
+# $3 -- numeric field (e.g. T)
+# $4 -- analytic field filename (e.g. mycase/5000/T_analytic)
+define FieldDiff
+
+$1/$2/$3_diff: \
+  $1/$2/$3 \
+  $1/$2/$3_analytic \
+  $(addprefix $1/,$(meshFiles)) \
+  $(addprefix $1/,$(systemFiles)) \
+  $(sumFields)
+	$(sumFields) -case $1 $2 $3_diff $2 $3 $2 $3_analytic -scale0 1 -scale1 -1
+
+$(eval $(call CopyFile,$4,$1/$2/$3_analytic))
+
+endef
+
+# $1 -- case
+# $2 -- time
+# $3 -- field 
+define GlobalSum
+
+$1/$2/globalSum$3.dat: \
+  $1/$2/$3 \
+  $(globalSum)
+	$(globalSum) -case $1 -time $2 $3
+	mv $1/globalSum$3.dat $$@ # TODO: not parallel safe
+
+endef
+
+# $1 -- stat filename                                                           
+# $2 -- globalSum filename
+# $3 -- field index
+define ExtractStat
+	tail -n1 $2 | cut -d' ' -f$3 > $1
+endef
