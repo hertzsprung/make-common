@@ -21,17 +21,44 @@ endef
 # $3 -- field
 define L2Error
 
-$1/$2/l2error$3.txt: $1/$2/l2error$3_diff.txt $1/$2/l2error$3_analytic.txt
-	paste -d'/' $1/$2/l2error$3_diff.txt $1/$2/l2error$3_analytic.txt | bc -l > $$@
-
-$1/$2/l2error$3_diff.txt: $1/$2/globalSum$3_diff.dat
-	$(call ExtractStat,$$@,$$<,3)
-
-$1/$2/l2error$3_analytic.txt: $1/$2/globalSum$3_analytic.dat
-	$(call ExtractStat,$$@,$$<,3)
+$(eval $(call LError,$1,$2,$3,l2,3))
 
 $(eval $(call GlobalSum,$1,$2,$3_diff))
 $(eval $(call GlobalSum,$1,$2,$3_analytic))
+
+endef
+
+# Create $1/$2/linferror$3.txt and $1/$2/l2error$3.txt by analysing $1/$2/$3_diff
+# (which should be defined using FieldDiff) and $1/$2/$3_analytic
+#
+# $1 -- case
+# $2 -- time
+# $3 -- field
+define Errors
+
+$(eval $(call LError,$1,$2,$3,l2,3))
+$(eval $(call LError,$1,$2,$3,linf,4))
+
+$(eval $(call GlobalSum,$1,$2,$3_diff))
+$(eval $(call GlobalSum,$1,$2,$3_analytic))
+
+endef
+
+# $1 -- case
+# $2 -- time
+# $3 -- field
+# $4 -- error type
+# $5 -- column
+define LError
+
+$1/$2/$4error$3.txt: $1/$2/$4error$3_diff.txt $1/$2/$4error$3_analytic.txt
+	paste -d'/' $1/$2/$4error$3_diff.txt $1/$2/$4error$3_analytic.txt | bc -l > $$@
+
+$1/$2/$4error$3_diff.txt: $1/$2/globalSum$3_diff.dat
+	$(call ExtractStat,$$@,$$<,$5)
+
+$1/$2/$4error$3_analytic.txt: $1/$2/globalSum$3_analytic.dat
+	$(call ExtractStat,$$@,$$<,$5)
 
 endef
 
