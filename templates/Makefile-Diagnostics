@@ -34,13 +34,14 @@ endef
 # $1 -- case
 # $2 -- time
 # $3 -- field
+# $4 -- globalSum options (optional)
 define Errors
 
 $(eval $(call LError,$1,$2,$3,l2,3))
 $(eval $(call LError,$1,$2,$3,linf,4))
 
-$(eval $(call GlobalSum,$1,$2,$3_diff))
-$(eval $(call GlobalSum,$1,$2,$3_analytic))
+$(eval $(call GlobalSum,$1,$2,$3_diff,$4))
+$(eval $(call GlobalSum,$1,$2,$3_analytic,$4))
 
 endef
 
@@ -85,13 +86,24 @@ endef
 # $1 -- case
 # $2 -- time
 # $3 -- field 
+# $4 -- extra globalSum options (optional)
 define GlobalSum
 
 $1/$2/globalSum$3.dat: \
   $1/$2/$3 \
   $(globalSum)
-	$(globalSum) -case $1 -time $2 $3
+	$(globalSum) -case $1 -time $2 $4 $3
 	mv $1/globalSum$3.dat $$@ # TODO: not parallel safe
+
+endef
+
+# $1 -- case
+# $2 -- batch file
+# $3 -- set name
+define SetSet
+
+$1/$(polyMesh)/sets/$3: $2
+	$(setSet) -case $1 -constant -noVTK -batch $2
 
 endef
 
