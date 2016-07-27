@@ -53,7 +53,7 @@ endef
 define LError
 
 $1/$2/$4error$3.txt: $1/$2/$4error$3_diff.txt $1/$2/$4error$3_analytic.txt
-	paste -d'/' $1/$2/$4error$3_diff.txt $1/$2/$4error$3_analytic.txt | bc -l > $$@
+	python3 -c "print(`paste -d'/' $1/$2/$4error$3_diff.txt $1/$2/$4error$3_analytic.txt`)" > $$@
 
 $1/$2/$4error$3_diff.txt: $1/$2/globalSum$3_diff.dat
 	$(call ExtractStat,$$@,$$<,$5)
