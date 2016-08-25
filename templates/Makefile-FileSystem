@@ -46,6 +46,29 @@ $(eval $(call CopyFile,$1/$2,$3/$2))
 
 endef
 
+$(eval $(call CopyTreeWithPattern,$3,$1,phi))
+# Copy files recursively matching a pattern from a source directory
+# to a destination directory.
+#
+# $1 -- source directory
+# $2 -- pattern
+# $3 -- target directory
+define CopyTreeWithPattern
+
+$3.phony.$2: $1.phony.phi | $3
+	$(rsync) -rum -delete --include='$2' --include='*/' --exclude='*' $1/ $3
+	touch $$@
+
+endef
+
+
+# $1 -- directories
+define MakeDirs
+
+$(foreach dir,$1,$(eval $(call MakeDir,$(dir))))
+
+endef
+
 # $1 -- directory
 define MakeDir
 
