@@ -46,7 +46,6 @@ $(eval $(call CopyFile,$1/$2,$3/$2))
 
 endef
 
-$(eval $(call CopyTreeWithPattern,$3,$1,phi))
 # Copy files recursively matching a pattern from a source directory
 # to a destination directory.
 #
